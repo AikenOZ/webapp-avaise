@@ -1,0 +1,60 @@
+import React, { useState, useCallback } from 'react';
+import { Container, Box, Stack } from '@mantine/core';
+import { useTelegram } from './hooks/useTelegram';
+import { mockProfile } from './data/mockData';
+import { BackgroundEffects } from './components/BackgroundEffects';
+import { Header } from './components/Header';
+import { ProfileCard } from './components/ProfileCard';
+import { UsageStats } from './components/UsageStats';
+import { ActionButtons } from './components/ActionButtons';
+import { Navigation } from './components/Navigation';
+
+const TelegramWebApp = () => {
+  const { user, hapticFeedback, showAlert } = useTelegram();
+  const [activeTab, setActiveTab] = useState('profile');
+
+  const handleModelSwitch = useCallback(() => {
+    showAlert('Функция смены модели ИИ будет доступна в следующем обновлении!');
+  }, [showAlert]);
+
+  const handleSubscription = useCallback(() => {
+    showAlert('Управление подпиской скоро будет доступно!');
+  }, [showAlert]);
+
+  const handleTabChange = useCallback((value) => {
+    setActiveTab(value);
+    hapticFeedback('light');
+  }, [hapticFeedback]);
+
+  return (
+    <Box
+      style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(ellipse at top, #1a1a2e 0%, #0a0a0f 50%, #000000 100%)',
+        position: 'relative',
+      }}
+    >
+      <BackgroundEffects />
+      
+      <Container size="sm" style={{ position: 'relative', zIndex: 1 }}>
+        <Stack gap="xl" pt="xl" px="md" pb={120}>
+          <Header />
+          <ProfileCard profile={mockProfile} user={user} />
+          <UsageStats />
+          <ActionButtons 
+            onModelSwitch={handleModelSwitch}
+            onSubscription={handleSubscription}
+            hapticFeedback={hapticFeedback}
+          />
+        </Stack>
+      </Container>
+
+      <Navigation 
+        activeTab={activeTab} 
+        onChange={handleTabChange}
+      />
+    </Box>
+  );
+};
+
+export default TelegramWebApp;
