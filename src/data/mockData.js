@@ -10,7 +10,7 @@ export const mockProfile = {
     expires_at: "2025-11-25T19:16:00Z",
     days_left: 365,
     time_left: "185:03:11:10",
-    payment_method: "💳 Банковская карта"
+    payment_method: "Банковская карта"
   },
   daily_limits: {
     text: { used: 127, limit: 250 },

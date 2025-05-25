@@ -8,7 +8,6 @@ import { ProfileCard } from './components/ProfileCard';
 import { UsageStats } from './components/UsageStats';
 import { ModelSelector } from './components/ModelSelector';
 import { LanguageSelector } from './components/LanguageSelector';
-import { AdvancedSettings } from './components/AdvancedSettings';
 import { PricingSection } from './components/PricingSection';
 import { BottomNavigation } from './components/BottomNavigation';
 
@@ -30,7 +29,6 @@ const TelegramWebApp = () => {
           <>
             <ModelSelector hapticFeedback={hapticFeedback} />
             <LanguageSelector hapticFeedback={hapticFeedback} showAlert={showAlert} />
-            <AdvancedSettings hapticFeedback={hapticFeedback} />
           </>
         );
       

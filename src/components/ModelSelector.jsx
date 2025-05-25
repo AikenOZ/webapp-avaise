@@ -1,16 +1,19 @@
 import React, { memo, useState } from 'react';
-import { Stack, Group, Title, Text, Box } from '@mantine/core';
+import { Stack, Group, Title, Text, Box, Slider } from '@mantine/core';
 import { motion } from 'framer-motion';
-import { IconBrain, IconSparkles } from '@tabler/icons-react';
+import { IconBrain, IconSparkles, IconBolt } from '@tabler/icons-react';
 import { Card3D } from './ui/Card3D';
 
 export const ModelSelector = memo(({ hapticFeedback }) => {
   const [selectedModel, setSelectedModel] = useState('gpt4');
+  const [settings, setSettings] = useState({
+    aiCreativity: 50
+  });
 
   const models = [
     {
       id: 'gpt4',
-      name: 'GPT-4 Turbo',
+      name: 'Avaise 2.5',
       description: 'Максимальная точность и логика',
       icon: IconBrain,
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -18,7 +21,7 @@ export const ModelSelector = memo(({ hapticFeedback }) => {
     },
     {
       id: 'claude',
-      name: 'Claude Sonnet',
+      name: 'Avaise 2.0',
       description: 'Креативность и понимание',
       icon: IconSparkles,
       gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -29,6 +32,14 @@ export const ModelSelector = memo(({ hapticFeedback }) => {
   const handleModelSelect = (modelId) => {
     setSelectedModel(modelId);
     hapticFeedback('medium');
+  };
+
+  const handleSettingChange = (setting, value) => {
+    setSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }));
+    hapticFeedback('light');
   };
 
   return (
@@ -238,6 +249,96 @@ export const ModelSelector = memo(({ hapticFeedback }) => {
             </Text>
           </Box>
         </motion.div>
+
+        {/* Слайдер креативности AI */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.3 }}
+        >
+          <Box
+            style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1))',
+              border: '1px solid rgba(139, 92, 246, 0.3)',
+            }}
+          >
+            <Stack gap="md">
+              <Group justify="space-between" align="center">
+                <Group gap="md">
+                  <Box
+                    style={{
+                      width: 36,
+                      height: 36,
+                      borderRadius: '8px',
+                      background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)',
+                    }}
+                  >
+                    <IconBolt size={18} color="white" />
+                  </Box>
+                  
+                  <Stack gap={2}>
+                    <Text size="sm" fw={600} c="white">
+                      Креативность AI
+                    </Text>
+                    <Text size="xs" c="gray.3">
+                      Уровень творческого мышления
+                    </Text>
+                  </Stack>
+                </Group>
+                
+                <motion.div
+                  key={settings.aiCreativity}
+                  initial={{ scale: 1.2 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <Text size="lg" fw={700} c="violet.3">
+                    {settings.aiCreativity}%
+                  </Text>
+                </motion.div>
+              </Group>
+              
+              <Slider
+                value={settings.aiCreativity}
+                onChange={(value) => handleSettingChange('aiCreativity', value)}
+                min={0}
+                max={100}
+                step={5}
+                color="violet"
+                size="md"
+                styles={{
+                  thumb: {
+                    background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                    border: '2px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.4)',
+                    width: 20,
+                    height: 20,
+                  },
+                  track: {
+                    background: 'rgba(113, 113, 122, 0.3)',
+                    height: 6,
+                  },
+                  bar: {
+                    background: 'linear-gradient(90deg, #8b5cf6, #ec4899)',
+                    boxShadow: '0 2px 8px rgba(139, 92, 246, 0.4)',
+                  }
+                }}
+              />
+              
+              <Group justify="space-between">
+                <Text size="xs" c="dimmed">Логичный</Text>
+                <Text size="xs" c="dimmed">Креативный</Text>
+              </Group>
+            </Stack>
+          </Box>
+        </motion.div>
+      
       </Stack>
     </Card3D>
   );

@@ -69,47 +69,6 @@ export const UsageStats = memo(() => {
             </Text>
           </Group>
         </Card>
-        
-        {/* Дополнительная информация */}
-        <Stack gap="md">
-          <Group gap="md" grow>
-            <Card
-              padding="md"
-              radius="md"
-              style={{
-                background: 'rgba(16, 185, 129, 0.1)',
-                border: '1px solid rgba(16, 185, 129, 0.3)',
-              }}
-            >
-              <Stack align="center" gap="xs">
-                <Text size="xs" c="dimmed" ta="center">
-                  Самый активный тип
-                </Text>
-                <Text size="sm" fw={700} c="green.3" ta="center">
-                  📝 Текстовые
-                </Text>
-              </Stack>
-            </Card>
-            
-            <Card
-              padding="md"
-              radius="md"
-              style={{
-                background: 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.3)',
-              }}
-            >
-              <Stack align="center" gap="xs">
-                <Text size="xs" c="dimmed" ta="center">
-                  Средняя загрузка
-                </Text>
-                <Text size="sm" fw={700} c="blue.3" ta="center">
-                  {Math.round(statsItems.reduce((total, item) => total + item.percentage, 0) / statsItems.length)}%
-                </Text>
-              </Stack>
-            </Card>
-          </Group>
-        </Stack>
       </Stack>
     </Card3D>
   );

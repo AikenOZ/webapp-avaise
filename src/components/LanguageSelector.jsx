@@ -28,7 +28,6 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
     setSelectedLanguage(langId);
     hapticFeedback('light');
     const langName = languages.find(l => l.id === langId)?.name;
-    showAlert(`Язык изменен на ${langName}`);
   };
 
   return (
