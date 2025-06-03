@@ -1,21 +1,23 @@
 import React, { useState, memo } from 'react';
 import { Card } from '@mantine/core';
-import { motion } from 'framer-motion';
 
 export const Card3D = memo(({ children, className = "", delay = 0, ...props }) => {
   const [isHovered, setIsHovered] = useState(false);
   
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: delay * 0.1 }}
+    <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={className}
       style={{
-        transform: `scale(${isHovered ? 1.02 : 1})`,
-        transition: 'transform 0.2s ease',
+        opacity: 0,
+        // ИСПРАВЛЕНО: используем translate3d вместо translate3d
+        transform: 'translate3d(0, 20px, 0)',
+        animation: `cardAppear 0.3s ease-out ${delay * 0.1}s forwards`,
+        // ДОБАВЛЕНО: принудительное аппаратное ускорение
+        willChange: 'transform, opacity',
+        backfaceVisibility: 'hidden',
+        perspective: '1000px',
       }}
       {...props}
     >
@@ -24,17 +26,50 @@ export const Card3D = memo(({ children, className = "", delay = 0, ...props }) =
         padding="xl"
         radius="xl"
         style={{
-          background: 'rgba(39, 39, 42, 0.7)',
+          background: 'rgba(39, 39, 42, 0.9)',
           border: '1px solid rgba(113, 113, 122, 0.3)',
           boxShadow: isHovered 
-            ? '0 35px 60px -12px rgba(139, 92, 246, 0.3)' 
-            : '0 25px 45px -5px rgba(0, 0, 0, 0.5)',
-          transition: 'all 0.3s ease',
+            ? '0 15px 30px rgba(139, 92, 246, 0.2)' 
+            : '0 8px 20px rgba(0, 0, 0, 0.3)',
+          transition: 'all 0.2s ease',
           borderColor: isHovered ? 'rgba(139, 92, 246, 0.5)' : 'rgba(113, 113, 122, 0.3)',
+          // ИСПРАВЛЕНО: убираем scale при ховере (он вызывает размытие)
+          // transform: `scale(${isHovered ? 1.005 : 1})`,
+          transform: 'translate3d(0, 0, 0)', // принудительное GPU ускорение
+          // ДОБАВЛЕНО: отключение фильтров
+          filter: 'none',
+          backdropFilter: 'none',
+          // ДОБАВЛЕНО: четкое позиционирование
+          willChange: 'transform',
+          backfaceVisibility: 'hidden',
         }}
       >
         {children}
       </Card>
-    </motion.div>
+
+      <style jsx>{`
+        @keyframes cardAppear {
+          from {
+            opacity: 0;
+            /* ИСПРАВЛЕНО: используем translate3d */
+            transform: translate3d(0, 20px, 0);
+          }
+          to {
+            opacity: 1;
+            /* ИСПРАВЛЕНО: используем translate3d */
+            transform: translate3d(0, 0, 0);
+          }
+        }
+        
+        /* ДОБАВЛЕНО: принудительное отключение размытия для всех вложенных элементов */
+        .card3d, .card3d * {
+          filter: none !important;
+          backdrop-filter: none !important;
+          will-change: transform, opacity;
+          transform-style: preserve-3d;
+          backface-visibility: hidden;
+        }
+      `}</style>
+    </div>
   );
 });

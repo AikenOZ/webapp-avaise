@@ -1,155 +1,190 @@
-import React, { useState, useCallback } from 'react';
-import { Container, Box, Stack } from '@mantine/core';
+import React, { useState, useCallback, Suspense, lazy, useEffect, useMemo } from 'react';
+import { Container, Box, Stack, Loader, Center } from '@mantine/core';
 import { useTelegram } from './hooks/useTelegram';
 import { mockProfile } from './data/mockData';
-import { AnimatedBackground } from './components/AnimatedBackground';
-import { Header } from './components/Header';
-import { ProfileCard } from './components/ProfileCard';
-import { UsageStats } from './components/UsageStats';
-import { ModelSelector } from './components/ModelSelector';
-import { LanguageSelector } from './components/LanguageSelector';
-import { PricingSection } from './components/PricingSection';
-import { BottomNavigation } from './components/BottomNavigation';
+
+// Убираем тяжелые компоненты из основного бандла
+
+const BottomNavigation = lazy(() => import('./components/BottomNavigation').then(module => ({ default: module.BottomNavigation })));
+
+// Lazy loading всех остальных компонентов по маршрутам
+const ProfileCard = lazy(() => import('./components/ProfileCard').then(module => ({ default: module.ProfileCard })));
+const UsageStats = lazy(() => import('./components/UsageStats').then(module => ({ default: module.UsageStats })));
+const ModelSelector = lazy(() => import('./components/ModelSelector').then(module => ({ default: module.ModelSelector })));
+const LanguageSelector = lazy(() => import('./components/LanguageSelector').then(module => ({ default: module.LanguageSelector })));
+const PricingSection = lazy(() => import('./components/PricingSection').then(module => ({ default: module.PricingSection })));
+
+// Минимальный CSS-only фон без canvas
+const OptimizedBackground = React.memo(() => (
+  <Box
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: `
+        linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%),
+        radial-gradient(ellipse at 20% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%), 
+        radial-gradient(ellipse at 80% 80%, rgba(236, 72, 153, 0.06) 0%, transparent 50%)
+      `,
+      zIndex: 0,
+    }}
+  >
+    {/* Простые декоративные блики только CSS */}
+    <Box
+      style={{
+        position: 'absolute',
+        top: '10%',
+        right: '10%',
+        width: '150px',
+        height: '150px',
+        background: 'radial-gradient(circle, rgba(139, 92, 246, 0.04) 0%, transparent 70%)',
+        borderRadius: '50%',
+        animation: 'float 8s ease-in-out infinite',
+      }}
+    />
+    <Box
+      style={{
+        position: 'absolute',
+        bottom: '20%',
+        left: '20%',
+        width: '120px',
+        height: '120px',
+        background: 'radial-gradient(circle, rgba(236, 72, 153, 0.05) 0%, transparent 70%)',
+        borderRadius: '50%',
+        animation: 'float 10s ease-in-out infinite reverse',
+      }}
+    />
+  </Box>
+));
+
+// Оптимизированный компонент загрузки
+const FastLoader = React.memo(() => (
+  <Center py="md">
+    <Loader size="md" variant="dots" color="violet" />
+  </Center>
+));
+
+// Предзагрузка следующего компонента
+const usePreloadNextComponent = (currentTab) => {
+  useEffect(() => {
+    const preloadMap = {
+      'profile': () => import('./components/ModelSelector'),
+      'settings': () => import('./components/PricingSection'),
+      'upgrade': () => import('./components/ProfileCard')
+    };
+    
+    const preloader = preloadMap[currentTab];
+    if (preloader) {
+      const timer = setTimeout(preloader, 500); // Предзагружаем через 500мс
+      return () => clearTimeout(timer);
+    }
+  }, [currentTab]);
+};
 
 const TelegramWebApp = () => {
   const { user, hapticFeedback, showAlert } = useTelegram();
   const [activeTab, setActiveTab] = useState('profile');
+  const [isAppReady, setIsAppReady] = useState(false);
+
+  // Предзагружаем следующие компоненты
+  usePreloadNextComponent(activeTab);
 
   const handleTabChange = useCallback((tabId) => {
     setActiveTab(tabId);
-    hapticFeedback('light');
-    // Убрали уведомление - не показываем alert при смене раздела
+    hapticFeedback?.('light');
   }, [hapticFeedback]);
 
-  // Функция для отрисовки контента в зависимости от активной вкладки
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'settings':
-        return (
-          <>
-            <ModelSelector hapticFeedback={hapticFeedback} />
-            <LanguageSelector hapticFeedback={hapticFeedback} showAlert={showAlert} />
-          </>
-        );
+  // Мемоизированный рендер контента
+  const contentRenderer = useMemo(() => {
+    const renderContent = () => {
+      switch (activeTab) {
+        case 'settings':
+          return (
+            <>
+              <ModelSelector hapticFeedback={hapticFeedback} />
+              <LanguageSelector hapticFeedback={hapticFeedback} showAlert={showAlert} />
+            </>
+          );
+        
+        case 'upgrade':
+          return <PricingSection hapticFeedback={hapticFeedback} />;
+        
+        case 'profile':
+        default:
+          return (
+            <>
+              <ProfileCard profile={mockProfile} user={user} />
+              <UsageStats />
+            </>
+          );
+      }
+    };
+
+    return (
+      <Suspense fallback={<FastLoader />}>
+        {renderContent()}
+      </Suspense>
+    );
+  }, [activeTab, hapticFeedback, showAlert, user]);
+
+  // Быстрая инициализация
+  useEffect(() => {
+    // Сокращаем время до минимума
+    const timer = setTimeout(() => {
+      setIsAppReady(true);
       
-      case 'upgrade':
-        return (
-          <PricingSection hapticFeedback={hapticFeedback} />
-        );
-      
-      case 'profile':
-      default:
-        return (
-          <>
-            <ProfileCard profile={mockProfile} user={user} />
-            <UsageStats />
-          </>
-        );
-    }
-  };
+      // Сообщаем о готовности
+      if (typeof window.hideLoadingScreen === 'function') {
+        window.hideLoadingScreen();
+      }
+    }, 300); // Минимум для плавности
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Показываем минимальный лоадер пока приложение не готово
+  if (!isAppReady) {
+    return (
+      <Box style={{ minHeight: '100vh', position: 'relative' }}>
+        <OptimizedBackground />
+        <Container size="sm" style={{ position: 'relative', zIndex: 10 }}>
+          <Stack gap="xl" pt="xl" px="md" pb={120}>
+            <FastLoader />
+          </Stack>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
-    <Box
-      style={{
-        minHeight: '100vh',
-        background: `
-          radial-gradient(ellipse at top left, #1a1a2e 0%, #0a0a0f 50%), 
-          radial-gradient(ellipse at bottom right, #16213e 0%, #0a0a0f 50%),
-          linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%)
-        `,
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      {/* Анимированный фон с узлами и соединениями */}
-      <AnimatedBackground />
-      
-      {/* Дополнительные статичные декоративные элементы (более тонкие) */}
-      <Box
-        style={{
-          position: 'fixed',
-          top: '20%',
-          right: '10%',
-          width: '200px',
-          height: '200px',
-          background: 'radial-gradient(circle, rgba(139, 92, 246, 0.03) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(30px)',
-          zIndex: 1,
-          animation: 'float 8s ease-in-out infinite',
-        }}
-      />
-      <Box
-        style={{
-          position: 'fixed',
-          bottom: '15%',
-          left: '15%',
-          width: '150px',
-          height: '150px',
-          background: 'radial-gradient(circle, rgba(236, 72, 153, 0.04) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(25px)',
-          zIndex: 1,
-          animation: 'float 10s ease-in-out infinite reverse',
-        }}
-      />
+    <Box style={{ minHeight: '100vh', position: 'relative' }}>
+      <OptimizedBackground />
       
       <Container size="sm" style={{ position: 'relative', zIndex: 10 }}>
-        <Stack gap="xl" pt="xl" px="md" pb={120}> {/* Увеличил нижний отступ для навигации */}
-          <Header />
-          {renderContent()}
+        <Stack gap="xl" pt="xl" px="md" pb={120}>
+          <Suspense fallback={<FastLoader />}>
+         
+          </Suspense>
+          
+          {contentRenderer}
         </Stack>
       </Container>
 
-      {/* Нижняя навигация */}
-      <BottomNavigation 
-        activeTab={activeTab}
-        onChange={handleTabChange}
-        hapticFeedback={hapticFeedback}
-      />
+      <Suspense fallback={null}>
+        <BottomNavigation 
+          activeTab={activeTab}
+          onChange={handleTabChange}
+          hapticFeedback={hapticFeedback}
+        />
+      </Suspense>
 
-      {/* CSS анимации */}
+      {/* Оптимизированные CSS анимации */}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { 
-            transform: translateY(0px) rotate(0deg) scale(1); 
-          }
-          25% { 
-            transform: translateY(-15px) rotate(0.5deg) scale(1.02); 
-          }
-          50% { 
-            transform: translateY(-8px) rotate(-0.3deg) scale(0.98); 
-          }
-          75% { 
-            transform: translateY(-12px) rotate(0.3deg) scale(1.01); 
-          }
-        }
-        
-        @keyframes pulse {
-          0% { 
-            opacity: 0.3; 
-            transform: scale(1); 
-          }
-          50% { 
-            opacity: 0.6; 
-            transform: scale(1.02); 
-          }
-          100% { 
-            opacity: 0.3; 
-            transform: scale(1); 
-          }
-        }
-        
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        
-        /* Дополнительные градиентные анимации */
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+          0%, 100% { transform: translate3d(0px) translateZ(0); }
+          50% { transform: translate3d(-8px) translateZ(0); }
         }
       `}</style>
     </Box>

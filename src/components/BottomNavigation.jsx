@@ -1,29 +1,30 @@
 import React, { memo, useState } from 'react';
 import { Box, Group, Text, UnstyledButton } from '@mantine/core';
-import { motion } from 'framer-motion';
 import { IconSettings, IconUser, IconCrown } from '@tabler/icons-react';
+import { useLanguage } from './LanguageContext';
 
 export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) => {
   const [pressedButton, setPressedButton] = useState(null);
+  const { t } = useLanguage();
 
   const navigationItems = [
     {
       id: 'settings',
-      label: 'Настройки',
+      label: t('settings'),
       icon: IconSettings,
       activeColor: '#6366f1',
       glowColor: 'rgba(99, 102, 241, 0.4)'
     },
     {
       id: 'profile',
-      label: 'Профиль',
+      label: t('profile'),
       icon: IconUser,
       activeColor: '#8b5cf6',
       glowColor: 'rgba(139, 92, 246, 0.4)'
     },
     {
       id: 'upgrade',
-      label: 'Тарифы',
+      label: t('upgrade'),
       icon: IconCrown,
       activeColor: '#f59e0b',
       glowColor: 'rgba(245, 158, 11, 0.4)'
@@ -32,7 +33,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
 
   const handleTabPress = (tabId) => {
     setPressedButton(tabId);
-    hapticFeedback('medium');
+    hapticFeedback?.('medium');
     onChange(tabId);
     
     setTimeout(() => setPressedButton(null), 150);
@@ -50,10 +51,12 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
         maxWidth: '350px',
       }}
     >
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, type: "spring", stiffness: 120 }}
+      <div 
+        style={{
+          opacity: 0,
+          transform: 'translate3d(100px)',
+          animation: 'slideUpNav 0.4s ease-out 0.1s forwards'
+        }}
       >
         {/* Контейнер с размытым фоном */}
         <Box
@@ -71,8 +74,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'rgba(10, 10, 15, 0.4)',
-              backdropFilter: 'blur(15px)',
+              background: 'rgba(10, 10, 15, 0.85)',
               border: '1px solid rgba(139, 92, 246, 0.15)',
               borderRadius: '20px',
               boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 92, 246, 0.1)',
@@ -80,17 +82,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
           />
           
           {/* Анимированный блик */}
-          <motion.div
-            animate={{
-              x: ['-100%', '100%'],
-              opacity: [0, 0.2, 0]
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              repeatDelay: 3,
-              ease: "easeInOut"
-            }}
+          <div
             style={{
               position: 'absolute',
               top: 0,
@@ -100,6 +92,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
               background: 'linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.2), transparent)',
               pointerEvents: 'none',
               zIndex: 1,
+              animation: 'shimmer 7s ease-in-out infinite'
             }}
           />
           
@@ -112,13 +105,14 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                 const IconComponent = item.icon;
                 
                 return (
-                  <motion.div
+                  <div
                     key={item.id}
-                    initial={{ y: 15, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: index * 0.05, duration: 0.2 }}
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
+                    style={{
+                      opacity: 0,
+                      transform: 'translate3d(15px)',
+                      animation: `fadeInUp 0.2s ease-out ${0.1 + index * 0.05}s forwards`,
+                    }}
+                    className="nav-button-wrapper"
                   >
                     <UnstyledButton
                       onClick={() => handleTabPress(item.id)}
@@ -127,7 +121,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                         padding: '12px 16px',
                         borderRadius: '16px',
                         background: isActive 
-                          ? `${item.activeColor}CC` // CC = 80% непрозрачность
+                          ? `${item.activeColor}CC`
                           : isPressed 
                             ? 'rgba(139, 92, 246, 0.3)'
                             : 'transparent',
@@ -147,12 +141,11 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                         alignItems: 'center',
                         gap: '6px',
                       }}
+                      className="nav-button"
                     >
                       {/* Индикатор активности */}
                       {isActive && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
+                        <div
                           style={{
                             position: 'absolute',
                             top: -1,
@@ -163,21 +156,13 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                             borderRadius: '50%',
                             background: '#fff',
                             boxShadow: '0 0 8px rgba(255, 255, 255, 0.6)',
+                            animation: 'scaleIn 0.3s ease-out'
                           }}
                         />
                       )}
                       
                       {/* Иконка */}
-                      <motion.div
-                        animate={isActive ? {
-                          rotate: [0, -5, 5, 0],
-                          scale: [1, 1.05, 1]
-                        } : {}}
-                        transition={{
-                          duration: 1.5,
-                          repeat: isActive ? Infinity : 0,
-                          repeatDelay: 4
-                        }}
+                      <div
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -189,6 +174,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                             ? 'rgba(255, 255, 255, 0.15)' 
                             : 'rgba(139, 92, 246, 0.1)',
                           border: '1px solid rgba(255, 255, 255, 0.08)',
+                          animation: isActive ? 'wiggle 1.5s ease-in-out infinite 4s' : 'none'
                         }}
                       >
                         <IconComponent 
@@ -196,7 +182,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                           color={isActive ? '#ffffff' : '#8b5cf6'} 
                           stroke={1.5}
                         />
-                      </motion.div>
+                      </div>
                       
                       {/* Текст */}
                       <Text 
@@ -214,16 +200,7 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                       
                       {/* Пульсирующий эффект */}
                       {isActive && (
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.3, 1],
-                            opacity: [0.3, 0, 0.3]
-                          }}
-                          transition={{
-                            duration: 2.5,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                          }}
+                        <div
                           style={{
                             position: 'absolute',
                             top: '50%',
@@ -235,17 +212,100 @@ export const BottomNavigation = memo(({ activeTab, onChange, hapticFeedback }) =
                             background: `${item.activeColor}40`,
                             pointerEvents: 'none',
                             zIndex: -1,
+                            animation: 'pulse 2.5s ease-in-out infinite'
                           }}
                         />
                       )}
                     </UnstyledButton>
-                  </motion.div>
+                  </div>
                 );
               })}
             </Group>
           </Box>
         </Box>
-      </motion.div>
+      </div>
+
+      {/* CSS анимации */}
+      <style jsx>{`
+        @keyframes slideUpNav {
+          from {
+            opacity: 0;
+            transform: translate3d(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0);
+          }
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translate3d(15px);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% {
+            transform: translateX(-100%);
+            opacity: 0;
+          }
+          20% {
+            opacity: 0.2;
+          }
+          40% {
+            opacity: 0;
+          }
+          100% {
+            transform: translateX(100%);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes scaleIn {
+          from {
+            transform: translateX(-50%) scale(0);
+          }
+          to {
+            transform: translateX(-50%) scale(1);
+          }
+        }
+        
+        @keyframes wiggle {
+          0%, 100% {
+            transform: rotate(0deg) scale(1);
+          }
+          25% {
+            transform: rotate(-5deg) scale(1.05);
+          }
+          75% {
+            transform: rotate(5deg) scale(1.05);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.3;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.3);
+            opacity: 0;
+          }
+        }
+        
+        .nav-button-wrapper:hover .nav-button {
+          transform: scale(1.01);
+        }
+        
+        .nav-button:active {
+          transform: scale(0.99);
+        }
+      `}</style>
     </Box>
   );
 });

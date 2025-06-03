@@ -1,23 +1,24 @@
 import React, { memo, useState } from 'react';
 import { Stack, Group, Title, Text, Box } from '@mantine/core';
-import { motion } from 'framer-motion';
 import { IconLanguage } from '@tabler/icons-react';
 import { Card3D } from './ui/Card3D';
+import { useLanguage } from './LanguageContext';
 
 export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
-  const [selectedLanguage, setSelectedLanguage] = useState('ru');
+  const { currentLanguage, changeLanguage, t } = useLanguage();
+  const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
 
   const languages = [
     {
       id: 'ru',
-      name: 'Русский',
+      name: t('russian'),
       flag: '🇷🇺',
       gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       glowColor: 'rgba(102, 126, 234, 0.4)'
     },
     {
       id: 'en',
-      name: 'English',
+      name: t('english'),
       flag: '🇺🇸',
       gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
       glowColor: 'rgba(245, 87, 108, 0.4)'
@@ -26,18 +27,21 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
 
   const handleLanguageSelect = (langId) => {
     setSelectedLanguage(langId);
-    hapticFeedback('light');
+    changeLanguage(langId);
+    hapticFeedback?.('light');
+    
+    // Показываем уведомление о смене языка
     const langName = languages.find(l => l.id === langId)?.name;
+    if (showAlert) {
+     
+    }
   };
 
   return (
     <Card3D delay={3}>
       <Stack gap="lg">
         <Group gap="xs" align="center">
-          <motion.div
-            whileHover={{ rotate: 360 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="icon-wrapper">
             <Box
               style={{
                 width: 40,
@@ -49,13 +53,14 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
                 justifyContent: 'center',
                 boxShadow: '0 8px 25px rgba(16, 185, 129, 0.3)',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
+                transition: 'transform 0.8s ease',
               }}
             >
               <IconLanguage size={20} color="white" />
             </Box>
-          </motion.div>
+          </div>
           <Title order={3} size="h4" c="white" fw={600}>
-            Язык интерфейса
+            {t('interfaceLanguage')}
           </Title>
         </Group>
 
@@ -64,13 +69,14 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
             const isSelected = selectedLanguage === language.id;
             
             return (
-              <motion.div
+              <div
                 key={language.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 + index * 0.1, duration: 0.3 }}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                style={{
+                  opacity: 0,
+                  transform: 'translate3d(20px)',
+                  animation: `fadeInUp 0.3s ease-out ${0.2 + index * 0.1}s forwards`
+                }}
+                className="language-option"
               >
                 <Box
                   onClick={() => handleLanguageSelect(language.id)}
@@ -91,19 +97,11 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
                     transition: 'all 0.3s ease',
                     overflow: 'hidden',
                   }}
+                  className="language-box"
                 >
                   {/* Эффект свечения для выбранного языка */}
                   {isSelected && (
-                    <motion.div
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.6, 0.3]
-                      }}
-                      transition={{ 
-                        duration: 2, 
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
+                    <div
                       style={{
                         position: 'absolute',
                         top: '50%',
@@ -113,29 +111,23 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
                         height: '120%',
                         borderRadius: '16px',
                         background: language.gradient,
-                        filter: 'blur(20px)',
                         pointerEvents: 'none',
                         zIndex: 0,
+                        animation: 'pulse 2s ease-in-out infinite'
                       }}
                     />
                   )}
                   
                   <Group justify="center" align="center" gap="md" style={{ position: 'relative', zIndex: 2 }}>
-                    <motion.div
-                      animate={isSelected ? { 
-                        rotate: [0, 10, -10, 0],
-                        scale: [1, 1.1, 1]
-                      } : {}}
-                      transition={{ 
-                        duration: 1.5, 
-                        repeat: isSelected ? Infinity : 0,
-                        repeatDelay: 3
+                    <div
+                      style={{
+                        animation: isSelected ? 'wiggle 1.5s ease-in-out infinite 3s' : 'none'
                       }}
                     >
                       <Text size="xl" style={{ fontSize: '28px' }}>
                         {language.flag}
                       </Text>
-                    </motion.div>
+                    </div>
                     
                     <Stack align="center" gap={2}>
                       <Text 
@@ -153,9 +145,7 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
                   
                   {/* Индикатор активности */}
                   {isSelected && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
+                    <div
                       style={{
                         position: 'absolute',
                         top: 8,
@@ -165,15 +155,78 @@ export const LanguageSelector = memo(({ hapticFeedback, showAlert }) => {
                         borderRadius: '50%',
                         background: '#10b981',
                         boxShadow: '0 0 10px rgba(16, 185, 129, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3)',
+                        animation: 'scaleRotateIn 0.5s ease-out'
                       }}
                     />
                   )}
                 </Box>
-              </motion.div>
+              </div>
             );
           })}
         </Group>
       </Stack>
+
+      {/* CSS анимации */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translate3d(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0);
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0.3;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0.6;
+          }
+        }
+        
+        @keyframes wiggle {
+          0%, 100% {
+            transform: rotate(0deg) scale(1);
+          }
+          25% {
+            transform: rotate(10deg) scale(1.1);
+          }
+          75% {
+            transform: rotate(-10deg) scale(1.1);
+          }
+        }
+        
+        @keyframes scaleRotateIn {
+          from {
+            transform: scale(0) rotate(-180deg);
+          }
+          to {
+            transform: scale(1) rotate(0deg);
+          }
+        }
+        
+        .icon-wrapper:hover .language-box {
+          transform: scale(1.01);
+        }
+        
+        .language-option:hover .language-box {
+          transform: scale(1.01);
+        }
+        
+        .language-option:active .language-box {
+          transform: scale(0.99);
+        }
+        
+        .icon-wrapper:hover Box {
+          transform: rotate(360deg);
+        }
+      `}</style>
     </Card3D>
   );
 });

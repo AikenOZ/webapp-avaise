@@ -1,3 +1,4 @@
+// Данные профиля остаются статичными
 export const mockProfile = {
   user_info: {
     username: "AikenOZ",
@@ -21,37 +22,38 @@ export const mockProfile = {
   }
 };
 
-export const statsItems = [
+// Функция для создания статистических данных с переводами
+export const createStatsItems = (t) => [
   { 
-    name: 'Текстовые', 
+    name: t('textRequests'), 
     used: 127, 
     limit: 250,
     color: 'blue',
     percentage: Math.round((127/250) * 100)
   },
   { 
-    name: 'Голосовые', 
+    name: t('voiceRequests'), 
     used: 23, 
     limit: 50,
     color: 'green',
     percentage: Math.round((23/50) * 100)
   },
   { 
-    name: 'Изображения', 
+    name: t('imageRequests'), 
     used: 15, 
     limit: 50,
     color: 'violet',
     percentage: Math.round((15/50) * 100)
   },
   { 
-    name: 'Видео', 
+    name: t('videoRequests'), 
     used: 5, 
     limit: 40,
     color: 'orange',
     percentage: Math.round((5/40) * 100)
   },
   { 
-    name: 'Плейлисты', 
+    name: t('playlistRequests'), 
     used: 2, 
     limit: 10,
     color: 'pink',
@@ -59,15 +61,16 @@ export const statsItems = [
   }
 ];
 
-export const actionButtons = [
+// Функция для создания кнопок действий с переводами
+export const createActionButtons = (t) => [
   {
-    title: 'Сменить модель ИИ',
-    description: 'Выберите подходящую модель',
+    title: t('changeAiModel'),
+    description: t('selectSuitableModel'),
     gradient: { from: 'indigo', to: 'purple', deg: 135 }
   },
   {
-    title: 'Управление подпиской',
-    description: 'Тарифы и продления',
+    title: t('subscriptionManagement'),
+    description: t('tarifsAndRenewals'),
     gradient: { from: 'pink', to: 'orange', deg: 135 }
   }
 ];

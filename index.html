@@ -1,13 +1,347 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <title>OZ Avaise • Premium AI Platform</title>
+    
+    <!-- Стили для экрана загрузки -->
+    <style>
+      /* Сброс стилей */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      /* Экран загрузки */
+      #loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        opacity: 1;
+        transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      
+      /* Фоновые эффекты */
+      #loading-screen::before {
+        content: '';
+        position: absolute;
+        top: -200px;
+        right: -150px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+        border-radius: 50%;
+        
+        animation: float 6s ease-in-out infinite;
+      }
+      
+      #loading-screen::after {
+        content: '';
+        position: absolute;
+        bottom: -200px;
+        left: -150px;
+        width: 350px;
+        height: 350px;
+        background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+        border-radius: 50%;
+        
+        animation: float 8s ease-in-out infinite reverse;
+      }
+      
+      /* Контейнер загрузки */
+      .loading-container {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+      }
+      
+      /* Логотип */
+      .loading-logo {
+        margin-bottom: 2rem;
+        position: relative;
+      }
+      
+      .logo-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, #8b5cf6, #ec4899, #06b6d4, #10b981, #8b5cf6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        animation: rotate 3s linear infinite;
+        box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+      }
+      
+      .logo-inner {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #0a0a0f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 700;
+        color: #8b5cf6;
+        text-shadow: 0 0 20px rgba(139, 92, 246, 0.6);
+      }
+      
+      /* Заголовок */
+      .loading-title {
+        font-size: 24px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #8b5cf6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+        animation: glow 2s ease-in-out infinite alternate;
+      }
+      
+      .loading-subtitle {
+        font-size: 14px;
+        color: rgba(156, 163, 175, 0.8);
+        margin-bottom: 3rem;
+        font-weight: 500;
+      }
+      
+      /* Прогресс бар */
+      .loading-progress {
+        width: 280px;
+        height: 6px;
+        background: rgba(39, 39, 42, 0.8);
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+      }
+      
+      .loading-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #8b5cf6, #ec4899, #06b6d4);
+        background-size: 200% 100%;
+        border-radius: 10px;
+        width: 0%;
+        animation: progressFlow 2s ease-in-out, progressFill 3s ease-out forwards;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+      }
+      
+      /* Точки загрузки */
+      .loading-dots {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 2rem;
+      }
+      
+      .loading-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #8b5cf6;
+        animation: dotPulse 1.5s ease-in-out infinite;
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.4);
+      }
+      
+      .loading-dot:nth-child(2) {
+        animation-delay: 0.3s;
+        background: #ec4899;
+        box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
+      }
+      
+      .loading-dot:nth-child(3) {
+        animation-delay: 0.6s;
+        background: #06b6d4;
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+      }
+      
+      /* Текст загрузки */
+      .loading-text {
+        margin-top: 1.5rem;
+        font-size: 13px;
+        color: rgba(139, 92, 246, 0.7);
+        font-weight: 500;
+        animation: fadeInOut 2s ease-in-out infinite;
+      }
+      
+      /* Анимации */
+      @keyframes float {
+        0%, 100% { transform: translate3d(0px) scale(1); }
+        50% { transform: translate3d(-20px) scale(1.05); }
+      }
+      
+      @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes glow {
+        0% { text-shadow: 0 0 5px rgba(139, 92, 246, 0.3); }
+        100% { text-shadow: 0 0 20px rgba(139, 92, 246, 0.8), 0 0 30px rgba(139, 92, 246, 0.4); }
+      }
+      
+      @keyframes progressFlow {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+      }
+      
+      @keyframes progressFill {
+        0% { width: 0%; }
+        30% { width: 20%; }
+        60% { width: 65%; }
+        90% { width: 90%; }
+        100% { width: 100%; }
+      }
+      
+      @keyframes dotPulse {
+        0%, 100% { 
+          opacity: 0.3; 
+          transform: scale(0.8); 
+        }
+        50% { 
+          opacity: 1; 
+          transform: scale(1.2); 
+        }
+      }
+      
+      @keyframes fadeInOut {
+        0%, 100% { opacity: 0.5; }
+        50% { opacity: 1; }
+      }
+      
+      /* Скрытие экрана загрузки */
+      #loading-screen.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      
+      /* Адаптивность */
+      @media (max-width: 480px) {
+        .loading-title {
+          font-size: 20px;
+        }
+        
+        .loading-progress {
+          width: 240px;
+        }
+        
+        .logo-circle {
+          width: 100px;
+          height: 100px;
+        }
+        
+        .logo-inner {
+          width: 80px;
+          height: 80px;
+          font-size: 24px;
+        }
+      }
+    </style>
   </head>
   <body>
+    <!-- Экран загрузки -->
+    <div id="loading-screen">
+      <div class="loading-container">
+        <!-- Логотип -->
+        <div class="loading-logo">
+          <div class="logo-circle">
+            <div class="logo-inner">
+              OZ
+            </div>
+          </div>
+        </div>
+        
+        <!-- Заголовок -->
+        <h1 class="loading-title">OZ Avaise</h1>
+        <p class="loading-subtitle">Премиум AI Платформа</p>
+        
+        <!-- Прогресс бар -->
+        <div class="loading-progress">
+          <div class="loading-progress-bar"></div>
+        </div>
+        
+        <!-- Анимированные точки -->
+        <div class="loading-dots">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+        
+        <!-- Текст загрузки -->
+        <div class="loading-text" id="loading-text">
+          Инициализация...
+        </div>
+      </div>
+    </div>
+
+    <!-- React приложение -->
     <div id="root"></div>
+    
+    <!-- Скрипт управления загрузкой -->
+    <script>
+      // Тексты для анимации загрузки
+      const loadingTexts = [
+        'Инициализация...',
+        'Загрузка компонентов...',
+        'Подключение к AI...',
+        'Настройка интерфейса...',
+        'Почти готово...'
+      ];
+      
+      let textIndex = 0;
+      const loadingTextElement = document.getElementById('loading-text');
+      
+      // Анимация смены текста
+      const textInterval = setInterval(() => {
+        textIndex = (textIndex + 1) % loadingTexts.length;
+        
+        // Плавная смена текста
+        loadingTextElement.style.opacity = '0';
+        setTimeout(() => {
+          loadingTextElement.textContent = loadingTexts[textIndex];
+          loadingTextElement.style.opacity = '1';
+        }, 200);
+      }, 800);
+      
+      // Функция скрытия экрана загрузки
+      window.hideLoadingScreen = function() {
+        clearInterval(textInterval);
+        const loadingScreen = document.getElementById('loading-screen');
+        
+        // Показываем "Готово!" перед скрытием
+        loadingTextElement.textContent = 'Готово!';
+        
+        setTimeout(() => {
+          loadingScreen.classList.add('fade-out');
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 800);
+        }, 500);
+      };
+      
+      // Автоматическое скрытие через максимальное время (фаллбек)
+      setTimeout(() => {
+        if (document.getElementById('loading-screen').style.display !== 'none') {
+          window.hideLoadingScreen();
+        }
+      }, 10000); // 10 секунд максимум
+    </script>
+    
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

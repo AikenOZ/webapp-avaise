@@ -5,6 +5,7 @@ const translations = {
   ru: {
     // Заголовок
     platformName: 'OZ Avaise • Премиум AI Платформа',
+    outOf: 'из',
     
     // Навигация
     profile: 'Профиль',
@@ -37,8 +38,8 @@ const translations = {
     additional: 'Дополнительно',
     
     // Модели
-    maxAccuracy: 'Максимальная точность и логика',
-    creativityUnderstanding: 'Креативность и понимание',
+    maxAccuracy: 'Модель способная размышлять',
+    creativityUnderstanding: 'Повседневная модель',
     selectedModel: 'Выбранная модель',
     
     // Дополнительные настройки
@@ -52,6 +53,14 @@ const translations = {
     aiCreativityDesc: 'Уровень творческого мышления',
     logical: 'Логичный',
     creative: 'Креативный',
+    
+    // Расширенные настройки модели
+    advancedSettings: 'Дополнительно',
+    customPromptTitle: 'Кастомный промпт для модели',
+    customPromptDescription: 'Введите дополнительные инструкции для AI модели. Этот промпт будет использоваться при каждом запросе.',
+    customPromptPlaceholder: 'Например: Отвечай всегда кратко и по делу. Используй простые слова. Добавляй эмодзи в ответы...',
+    confirm: 'Подтвердить',
+    promptSaved: 'Промпт активирован',
     
     // Тарифы
     ozPremium: '👑 OZ Premium',
@@ -70,7 +79,7 @@ const translations = {
     chooseDays: 'Выберите желаемое количество дней',
     day: 'день',
     days: 'дней',
-    choosePayment: 'Выберите способ оплаты ниже 👇',
+    choosePayment: 'Выберите способ оплаты ниже',
     telegramStars: 'Telegram Stars',
     bankSbp: 'Банк \\ СБП',
     purchase: 'Приобрести',
@@ -88,8 +97,7 @@ const translations = {
     tariff: 'Тариф:',
     agreement: '✅ Оформляя тариф, я даю согласие на обработку персональных данных и соглашаюсь с условиями',
     publicOffer: 'публичной оферты',
-    pay: '🚀 Оплатить',
-    confirm: '💳 Подтвердить',
+    pay: 'Оплатить',
     
     // Валидация
     emailRequired: 'Введите email адрес',
@@ -111,6 +119,7 @@ const translations = {
   en: {
     // Header
     platformName: 'OZ Avaise • Premium AI Platform',
+    outOf: 'of',
     
     // Navigation
     profile: 'Profile',
@@ -143,7 +152,7 @@ const translations = {
     additional: 'Additional',
     
     // Models
-    maxAccuracy: 'Maximum accuracy and logic',
+    maxAccuracy: 'Thinking and logic model',
     creativityUnderstanding: 'Creativity and understanding',
     selectedModel: 'Selected model',
     
@@ -158,6 +167,14 @@ const translations = {
     aiCreativityDesc: 'Level of creative thinking',
     logical: 'Logical',
     creative: 'Creative',
+    
+    // Advanced model settings
+    advancedSettings: 'Advanced Settings',
+    customPromptTitle: 'Custom Model Prompt',
+    customPromptDescription: 'Enter additional instructions for the AI model. This prompt will be used with every request.',
+    customPromptPlaceholder: 'For example: Always answer briefly and to the point. Use simple words. Add emojis to responses...',
+    confirm: 'Confirm',
+    promptSaved: 'Prompt saved and active',
     
     // Pricing
     ozPremium: '👑 OZ Premium',
@@ -194,8 +211,7 @@ const translations = {
     tariff: 'Tariff:',
     agreement: '✅ By placing an order, I consent to personal data processing and agree to the terms specified in',
     publicOffer: 'public offer',
-    pay: '🚀 Pay',
-    confirm: '💳 Confirm',
+    pay: 'Pay',
     
     // Validation
     emailRequired: 'Enter email address',

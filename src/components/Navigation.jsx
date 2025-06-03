@@ -10,7 +10,6 @@ export const Navigation = memo(({ activeTab, onChange }) => (
       left: 0,
       right: 0,
       background: 'rgba(10, 10, 15, 0.95)',
-      backdropFilter: 'blur(20px)',
       borderTop: '1px solid rgba(139, 92, 246, 0.4)',
       zIndex: 50,
       boxShadow: '0 -20px 40px rgba(0, 0, 0, 0.3)',
@@ -40,12 +39,12 @@ export const Navigation = memo(({ activeTab, onChange }) => (
               background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.4))',
               color: 'var(--mantine-color-violet-3)',
               boxShadow: '0 10px 35px rgba(139, 92, 246, 0.4)',
-              transform: 'translateY(-2px)',
+              transform: 'translate3d(-1px)', // Уменьшили для избежания размытия
               border: '1px solid rgba(255, 255, 255, 0.2)',
             },
             '&:hover:not([data-active])': {
               background: 'rgba(139, 92, 246, 0.15)',
-              transform: 'translateY(-1px)',
+              transform: 'translate3d(-1px)', // Уменьшили для избежания размытия
             }
           }
         }}

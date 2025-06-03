@@ -1,13 +1,14 @@
 import React, { memo } from 'react';
 import { Box, Group, Text, ThemeIcon, Progress } from '@mantine/core';
-import { motion } from 'framer-motion';
 
 export const SmoothProgress = memo(({ value, color, label, icon: Icon, delay = 0 }) => {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: delay * 0.05, duration: 0.3 }}
+    <div
+      style={{
+        opacity: 0,
+        transform: 'translateX(-20px)',
+        animation: `slideInProgress 0.3s ease-out ${delay * 0.05}s forwards`
+      }}
     >
       <Box>
         <Group justify="space-between" mb="xs">
@@ -35,10 +36,35 @@ export const SmoothProgress = memo(({ value, color, label, icon: Icon, delay = 0
             bar: {
               background: `linear-gradient(135deg, ${theme.colors[color][6]}, ${theme.colors[color][4]})`,
               boxShadow: `0 4px 15px ${theme.colors[color][6]}40`,
+              animation: `progressFill 1s ease-out ${delay * 0.05 + 0.2}s both`
             }
           })}
         />
       </Box>
-    </motion.div>
+
+      <style jsx>{`
+        @keyframes slideInProgress {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes progressFill {
+          from {
+            transform: scaleX(0);
+            transform-origin: left;
+          }
+          to {
+            transform: scaleX(1);
+            transform-origin: left;
+          }
+        }
+      `}</style>
+    </div>
   );
 });
